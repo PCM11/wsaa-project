@@ -65,17 +65,13 @@ Then navigate to http://127.0.0.1:5000/ in your browser.
 
 ## API Endpoints
 
-Method	  || Endpoint	         || Description
-
-GET	       /api/items	      Retrieve all items
-
-GET	       /api/items/<id>	  Retrieve item by ID
-
-POST	   /api/items	      Create a new item
-
-PUT	       /api/items/<id>	  Update an item
-
-DELETE	   /api/items/<id>	  Delete an item
+Method	    | Endpoint	       | Description 
+----------- | -----------------| ----------- 
+GET	        | /api/items	   | Retrieve all items 
+GET	        | /api/items/<id>  | Retrieve item by ID 
+POST	    | /api/items	   | Create a new item 
+PUT	        | /api/items/<id>  | Update an item |
+DELETE	    | /api/items/<id>  | Delete an item |
 
 API returns JSON responses and expects JSON-formatted request bodies for POST and PUT requests.
 
