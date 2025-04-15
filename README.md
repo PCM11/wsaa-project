@@ -36,7 +36,7 @@ git clone https://github.com/your-username/web-services-app.git
 cd web-services-app
 ```
 
-**2. Create a virtual environment (optional but recommended):**
+**2. Create a virtual environment:**
 
 ```bash
 python -m venv venv
@@ -47,6 +47,7 @@ source venv/bin/activate  # On Windows:venv\Scripts\activate
 
 ```bash
 pip install -r requirements.txt
+pip install Flask
 ```
 
 **4.Configure the database:**
