@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="eng"> 
+    <head> 
+        <title>Book List</title> 
+    </head> 
+
+    <body> 
+        <h1>Books</h1> 
+        <div id="button-showCreate" style="display:none">
+            <button id = "button-showCreate"onclick="showCreate"> Create </button> 
+        </div>
+        <div id="booktable" style="display:none"> table </div>
+        <div id="CreateUpdateForm" style="display:block"> form </div>
+
+        <script>
+            function showCreate(){
+                document.getElementById('button-showCreate').style.display="none";
+                document.getElementById('bookTable').style.display="none";
+                document.getElementById('createUpdateForm').style.display="block";
+            }
+
+
+
+            var book ={}
+            book.tittle = "Indaba My Children"
+            book.author = " Credo Mutwa"
+            book.isbn = "98765"
+
+            console.log("The book is "+ JSON.stringify( book))
+
+
+
+        </script>
+    
+    </body>
+
+    <table border="1"> 
+        <tr> 
+                <th>id</th> 
+                <th>Title</th> 
+                <th>Author</th> 
+                <th>Price</th> 
+                <th>Update</th> 
+                <th>Delete</th> 
+        </tr>
+
+        <tr>
+            <td>1</td>
+            <td>The Code of The Matrix</td> 
+            <td>James Evan Bomar</td>
+            <td>28</td> 
+            <td><button>update</button></td> 
+            <td><button>delete</button></td>
+        </tr>
+
+    </table>
+
+    <div id="myform">
+        id <input type="text" name="id"><br/> 
+        Title <input type="text" name="title"><br/> 
+        Author <input type="text" name="author"><br/> 
+        Price <input type="number" name="price"><br/> 
+        Just to show select <select name="status"> 
+           <option value="instock">in stock</option> 
+           <option value="outstock">out of stock</option> 
+           <option value="other">out of print</option> 
+       </select><br/>
+       
+       <span><button>Create</button></span>
+       <span><button style="display:none">Update</button></span> 
+    </div>
+
+    <h2> 
+        <span>Create a</span>  
+        <span style="display:none">Update this</span> Book
+    </h2>
+</html>

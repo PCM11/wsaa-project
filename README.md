@@ -7,6 +7,17 @@
 
 This repository contains a Flask-based web application that provides a **RESTful API** for interacting with a relational database. It includes both API endpoints and web pages that allow users to perform full **CRUD (Create, Read, Update, Delete)** operations on data stored in one or more database tables.
 
+## REST API Design
+
+**Entity:Book**
+
+Each book has the following attributes:
+
+- `id` (int)
+- `title` (string)
+- `author` (string)
+- `published_year` (int)
+
 ## Features
 
 - RESTful API for data access and manipulation
@@ -22,6 +33,8 @@ This repository contains a Flask-based web application that provides a **RESTful
 - JSON responses for API consumption
 
 - Clean and modular code structure
+
+
 
 ## Requirements
 
@@ -40,7 +53,7 @@ cd web-services-app
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows:venv\Scripts\activate
+source venv/bin/activate 
 ```
 
 **3.Install dependencies:**
@@ -50,17 +63,19 @@ pip install -r requirements.txt
 pip install Flask
 ```
 
-**4.Configure the database:**
 
-```python
-SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'  # or use PostgreSQL, MySQL, etc.
-```
-
-**5. Run the application:**
+**4. Run the application:**
 
 ```bash
 flask run
 ```
+
+**5.Test with curl**
+
+```bash
+curl http://127.0.0.1:5000/books
+```
+
 
 Then navigate to http://127.0.0.1:5000/ in your browser.
 
