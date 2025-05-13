@@ -1,6 +1,8 @@
-mysql = {
-    'host':"localhost",
-    'user':"root",
-    'password':"rooto",
-    'database':"grocery"
+# For configuration
+# config.py
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': 'root',
+    'database': 'grocery'
 }
