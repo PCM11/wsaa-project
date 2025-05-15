@@ -14,9 +14,9 @@ This repository contains a Flask-based web application that provides a **RESTful
 Each book has the following attributes:
 
 - `id` (int)
-- `title` (string)
-- `author` (string)
-- `published_year` (int)
+- `name` (string)
+- `category` (string)
+- `price` (int)
 
 ## Features
 
