@@ -12,33 +12,15 @@ This is a simple RESTful API built with **Flask** and **MySQL** for managing gro
 
 | File             | Description                                |
 |------------------|--------------------------------------------|
-| `app_server.py`  | Main Flask server handling the API         |
-| `groceryDAO.py`  | MySQL Data Access Object (DAO) layer       |
+| `app_server.py`  | Main Flask server handling the API.        |
+| `groceryDAO.py`  | MySQL Data Access Object (DAO) layer.      |
 | `config.py`      | Stores database credentials and connection info. Make sure to add your own DB config here.|
 | `items.html`     | Frontend HTML interface to view, create, update and delete grocery items.|
 | `requirements.txt`| List of Python packages needed to run the project (Flask, flask-cors, pymysql, etc.).|
 
-## Features
-
-- RESTful API for data access and manipulation
-
-- Web interface to interact with the API using HTML templates
-
-- Connects to one or more relational database tables
-
-- Full CRUD support: Create, Read, Update, Delete
-
-- Clean separation of frontend and backend concerns
-
-- JSON responses for API consumption
-
-- Clean and modular code structure
-
 ## Requirements
 
-Download and install [Python](https://www.python.org/downloads/)
-
-Download and install [MYSQL](https://www.python.org/downloads/)
+Download and install [Python](https://www.python.org/downloads/) and [MYSQL](https://www.python.org/downloads/).
 
 ## Getting Started
 
@@ -100,13 +82,11 @@ API returns JSON responses and expects JSON-formatted request bodies for POST an
 
 ## Deploying to PythonAnywhere
 
-- Update your WSGI file to import from app_server.py
+- Upload all files to PythonAnywhere project directory.
 
 - Install required modules via pip (use --user on PythonAnywhere)
 
-- Place all files in the same directory or adjust paths accordingly
-
-- Don't forget to reload the app after making changes
+- Update your WSGI file to import from app_server.py
 
 Set the WSGI file to:
 
@@ -118,3 +98,15 @@ if path not in sys.path:
 
 from app_server import app as application
 ```
+
+- Reload the web app from the **Web** tab.
+
+## Acknowledgements
+
+The sample code for this project can be found on: [https://github.com/andrewbeattycourseware/deploytopythonanywhere]
+
+Assistance from OpenAI's ChatGPT (GPT-4.5) was used to debug the code and prompt-based guidance was used to connect items table and categories table.
+Tool used: [ChatGPT by OpenAI](https://chat.openai.com/)
+
+## Author
+Phumi Tshidi

@@ -1,18 +1,24 @@
+<!--Ref: Lab 09.1 - Create HTML page -->
+<!--Ref: Lab 09.2 - Functionality on the webpage -->
+<!--Ref: Lab 09.4 - AJAX calls to REST -->
+
 <!DOCTYPE html>
-<html lang="en"></html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>View Grocery Items</title>
+    <title>Grocery Inventory</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Grocery Inventory</h1>
+    <h1>Grocery List</h1>
 
+    <!-- [A1] Button to show create form -->
     <div>
         <button type="button" id="showCreateButton" onclick="showCreate()">Create</button>
     </div>
 
+    <!-- [A2] Items table -->
     <div>
         <table class="table table-bordered table-hover" id="itemTable">
 
@@ -27,10 +33,11 @@
         </table>
     </div>
 
+    <!-- Create/Update Form -->
     <div id='createUpdateForm' style="display: none">
         <h2>
-            <span id="createLabel">Create a</span>
-            <span id="updateLabel">update</span> Grocery item
+            <span id="createLabel">Add an</span>
+            <span id="updateLabel">update</span>item
         </h2>
 
         <input type="hidden" id="id" name="id" />
@@ -38,8 +45,8 @@
         <label for="name">Name</label>
         <input type="text" id="name" name="name" placeholder="Enter item name" /><br/>
 
-        <label for="category">Category</label>
-        <input type="text" id="category" name="category" placeholder="Enter category" /><br/>
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id"></select><br/>
 
         <label for="price">Price</label>
         <input type="number" id="price" name="price" placeholder="Enter price" /><br/>
@@ -48,7 +55,11 @@
         <span><button id="doUpdateButton" onclick="doUpdate()">Update</button></span>
     </div>
 
+    <!-- Javascript CRUD -->
     <script>
+        let categoryMap = {}; // Maps category ID to name
+
+        // Show form for creating a new item
         function showCreate() {
             document.getElementById('showCreateButton').style.display = "none";
             document.getElementById('itemTable').style.display = "none";
@@ -60,7 +71,9 @@
             document.getElementById('doCreateButton').style.display = "block";
             document.getElementById('doUpdateButton').style.display = "none";
         }
+            clearForm();
 
+        // Return to main view 
         function showViewAll() {
             document.getElementById('showCreateButton').style.display = "block";
             document.getElementById('itemTable').style.display = "block";
@@ -83,22 +96,67 @@
             populateFormWithItem(item);
         }
 
+        // CRUD AJAX and Table Logic
         function doCreate() {
-            var item = {};
-            item.name = document.getElementById('name').value;
-            item.category = document.getElementById('category').value;
-            item.price = parseFloat(document.getElementById('price').value);
-            console.log(JSON.stringify(item));
+            var name = document.getElementById('name').value.trim();
+            var category_id = document.getElementById('category_id').value;
+            var price = parseFloat(document.getElementById('price').value);
+
+            if (!name) {
+                alert("Please enter a valid name.");
+                return;
+            }
+            if (!category_id) {
+                alert("Please select a category.");
+                return;
+            }
+            if (isNaN(price)) {
+                alert("Please enter a valid price.");
+                return;
+            }
+
+            var item = { name, category_id: parseInt(category_id), price };
             createItemAjax(item);
         }
 
         function doUpdate() {
-            var item = getItemFromForm();
-            var rowElement = document.getElementById(item.id);
-            updateItemAjax(item);
-            setItemInRow(rowElement, item);
-            clearForm();
-            showViewAll();
+            var item = {};
+            item.id = document.getElementById('id').value;
+            item.name = document.getElementById('name').value.trim();
+            item.category_id = parseInt(document.getElementById('category_id').value); 
+            item.price = parseFloat(document.getElementById('price').value);
+
+            if (!item.name || isNaN(item.category_id) || isNaN(item.price)) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
+            updateItemAjax(item, function(updatedItem) {
+                var rowElement = document.getElementById(updatedItem.id);
+                if (rowElement) {
+                    setItemInRow(rowElement, updatedItem);
+            } else {
+                addItemToTable(updatedItem); // fallback
+            }
+
+        clearForm();
+        showViewAll();
+    });
+}  
+        function updateItemAjax(item, callback) {
+            $.ajax({
+                url: "/items/" + encodeURIComponent(item.id),
+                method: "PUT",
+                data: JSON.stringify(item),
+                dataType: "JSON",
+                contentType: "application/json; charset=utf-8",
+                success: function(updatedItem) {
+                    callback(updatedItem);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error updating item:",xhr.status, error);
+                    alert("Failed To update item: " + xhr.responseText);
+                }
+            });
         }
 
         function doDelete(button) {
@@ -111,6 +169,13 @@
 
         function addItemToTable(item) {
             var tableElement = document.getElementById('itemTable');
+
+            var existingRow = document.getElementById(item.id);
+            if (existingRow) {
+               setItemInRow(existingRow, item);
+               return;
+    }
+
             var rowElement = tableElement.insertRow(-1);
             rowElement.setAttribute('id', item.id);
 
@@ -125,7 +190,7 @@
         function clearForm() {
             document.getElementById('id').value = '';
             document.getElementById('name').value = '';
-            document.getElementById('category').value = '';
+            document.getElementById('category_id').value = '';
             document.getElementById('price').value = '';
         }
 
@@ -133,7 +198,7 @@
             var item = {};
             item.id = rowElement.getAttribute('id');
             item.name = rowElement.cells[1].textContent;
-            item.category = rowElement.cells[2].textContent;
+            item.category_id = Object.keys(categoryMap).find(key => categoryMap[key] === rowElement.cells[2].textContent);
             item.price = parseFloat(rowElement.cells[3].textContent);
             return item;
         }
@@ -141,7 +206,7 @@
         function setItemInRow(rowElement, item) {
             rowElement.cells[0].textContent = item.id;
             rowElement.cells[1].textContent = item.name;
-            rowElement.cells[2].textContent = item.category;
+            rowElement.cells[2].textContent = categoryMap[item.category_id] || item.category_id;
             rowElement.cells[3].textContent = item.price;
         }
 
@@ -149,16 +214,17 @@
             document.getElementById('id').disabled = true;
             document.getElementById('id').value = item.id;
             document.getElementById('name').value = item.name;
-            document.getElementById('category').value = item.category;
+            document.getElementById('category_id').value = item.category_id;
             document.getElementById('price').value = item.price;
             return item;
         }
 
+        // AJAX Functions
         function getItemFromForm() {
             var item = {};
             item.id = document.getElementById('id').value;
             item.name = document.getElementById('name').value;
-            item.category = document.getElementById('category').value;
+            item.category_id = parseInt(document.getElementById('category_id').value);
             item.price = parseFloat(document.getElementById('price').value);
             console.log(JSON.stringify(item));
             return item;
@@ -179,7 +245,31 @@
                 }
             });
         }
-
+        getAllAjax();
+        
+        function loadCategories() {
+            $.ajax({
+                url: "/categories",
+                method: "GET",
+                dataType: "JSON",
+                success: function(result) {
+                    const categorySelect = document.getElementById("category_id");
+                    categorySelect.innerHTML = '';
+                    result.forEach(category => {
+                        categoryMap[category.id] = category.name;
+                        const option = document.createElement("option");
+                        option.value = category.id;
+                        option.text = category.name;
+                        categorySelect.appendChild(option);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log("error: " + status + " msg:" + error);
+                }
+            });
+        } 
+        loadCategories();
+      
         function createItemAjax(item) {
             $.ajax({
                 url: "/items",
@@ -189,29 +279,34 @@
                 contentType: "application/json; charset=utf-8",
                 success: function(result) {
                     item.id = result.id;
-                    addItemToTable(item);
+                    addItemToTable(result);
                     clearForm();
                     showViewAll();
                 },
                 error: function(xhr, status, error) {
-                    console.log("error: " + status + " msg:" + error);
+                    console.error("Error creating item:", xhr.status, error);
+                    alert("Failed to create item: " + xhr.responseText);
                 }
             });
         }
 
-        function updateItemAjax(item) {
-            $.ajax({
-                url: "/items/" + encodeURIComponent(item.id),
-                method: "PUT",
-                data: JSON.stringify(item),
-                dataType: "JSON",
-                contentType: "application/json; charset=utf-8",
-                success: function(result) {},
-                error: function(xhr, status, error) {
-                    console.log("error: " + status + " msg:" + error);
-                }
-            });
+function updateItemAjax(item, callback) {
+    $.ajax({
+        url: "/items/" + encodeURIComponent(item.id),
+        method: "PUT",
+        data: JSON.stringify(item),
+        dataType: "JSON",
+        contentType: "application/json; charset=utf-8",
+        success: function(updatedItem) {
+            callback(updatedItem); // ✅ this is critical
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating item:", xhr.status, error);
+            alert("Failed To update item: " + xhr.responseText);
         }
+    });
+}
+
 
         function deleteItemAjax(id) {
             $.ajax({
@@ -226,8 +321,11 @@
             });
         }
 
-        // Load items on page load
-        getAllAjax();
+        // Load categories and items
+        $(document).ready(function () {
+            loadCategories();
+            getAllAjax();
+        });
     </script>
 </body>
 </html>

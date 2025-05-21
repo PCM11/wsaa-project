@@ -1,76 +1,106 @@
+# Ref: Lab 6.01 - Creating your own API with Flask
+
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS, cross_origin
 from groceryDAO import groceryDAO
+
+categories = [
+    {"id": 1, "name": "Fruit"},
+    {"id": 2, "name": "Vegetables"},
+    {"id": 3, "name": "Dairy"},
+    {"id": 4, "name": "Bakery"},
+    {"id": 5, "name": "Meat"},
+    {"id": 6, "name": "Cereal"},
+    {"id": 7, "name": "Toiletries"},
+    {"id": 8, "name": "Beverage"},
+    {"id": 9, "name": "Cleaning"},
+    {"id": 10, "name": "Baking"}
+    ]
 
 app = Flask(__name__, static_url_path='', static_folder='.')
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-#  curl "http://127.0.0.1:5000"
+
 @app.route('/')
 @cross_origin()
 def index():
     return "Welcome to Grocery API!"
 
-# curl "http://127.0.0.1:5000/items"
-@app.route('/items')
+# GET all items
+@app.route('/items', methods=['GET'])
 @cross_origin()
 def getAll():
     return jsonify(groceryDAO.getAll())
 
-@app.route('/items/<int:id>')
+# GET item by id
+@app.route('/items/<int:id>', methods=['GET'])
 @cross_origin()
 def findById(id):
     item = groceryDAO.findByID(id)
-    return jsonify(item) if item else abort(404)
+    if not item:
+        abort(404, description="Item not found")
+    return jsonify(item)
 
-@app.route('/items', methods=['POST'])
-@cross_origin()
+# Create all new items
+@app.route("/items", methods=["POST"])
 def create():
-    if not request.json:
-        abort(400, description="Request must be JSON")
+    data = request.get_json()
+    if not data or "name" not in data or "price" not in data or "category_id" not in data:
+        abort(400, description="Missing required fields")
 
-    required_fields = ['name', 'category', 'price']
-    for field in required_fields:
-        if field not in request.json:
-            abort(400, description=f"Missing field: {field}")
+    item = {
+        "name": data["name"].strip(),
+        "price": data["price"],
+        "category_id": data["category_id"]
+    }
 
-    try:
-        item = {
-            "name": request.json['name'],
-            "category": request.json['category'],
-            "price": float(request.json['price']),
-        }
-    except ValueError:
-        abort(400, description="Invalid price value")
+    new_item = groceryDAO.create(item)
+    created_item = groceryDAO.findByID(new_item["id"])  # fetch with category name
+    return jsonify(created_item)
 
-    return jsonify(groceryDAO.create(item))
-
+#Update item
 @app.route('/items/<int:id>', methods=['PUT'])
 @cross_origin()
 def update(id):
     item = groceryDAO.findByID(id)
     if not item:
-        abort(404)
+        abort(404, description="Item not found")
 
-    data = request.json
-    try:
-        if 'name' in data:
-            item['name'] = data['name']
-        if 'category' in data:
-            item['category'] = data['category']
-        if 'price' in data:
-            item['price'] = float(data['price'])
-    except ValueError:
-        abort(400, description="Price must be a number")
+    data = request.get_json(force=True)
+    if not data:
+        abort(400, description="Missing JSON body")
 
-    return jsonify(groceryDAO.update(id, item))
+    if 'name' in data:
+        item["name"] = data["name"].strip()
+    if 'price' in data:
+        item["price"] = data["price"]
+    if 'category_id' in data:
+        item["category_id"] = data["category_id"] 
 
+    groceryDAO.update(id, item)
+    updated_item = groceryDAO.findByID(id)  # get fresh updated item (with category name)
+
+    category = groceryDAO.findByID(updated_item["category_id"])
+    updated_item["category"] = category["name"] if category else "Unknown"
+    return jsonify(updated_item)
+
+# Delete item
 @app.route('/items/<int:id>', methods=['DELETE'])
 @cross_origin()
 def delete(id):
+    item = groceryDAO.findByID(id)
+    if not item:
+        abort(404, description="Item not found")
+
     groceryDAO.delete(id)
-    return jsonify({'done': True})
+    return jsonify({"result": True})
+
+# Get categories
+@app.route('/categories', methods=['GET'])
+@cross_origin()
+def get_categories():
+    return jsonify(categories)
 
 if __name__ == '__main__':
     app.run(debug=True) 
