@@ -33,6 +33,7 @@ class GroceryDAO:
     # Create tables
     # Categories table was designed with guidance from ChatGPT(OpenAI).
     # Prompt: "How to connect tables in MYSQL"
+    
     def create_cattable(self):
         cursor = self.getcursor()
         sql = """

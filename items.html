@@ -13,12 +13,12 @@
 <body>
     <h1>Grocery List</h1>
 
-    <!-- [A1] Button to show create form -->
+    <!-- Button to show create form -->
     <div>
         <button type="button" id="showCreateButton" onclick="showCreate()">Create</button>
     </div>
 
-    <!-- [A2] Items table -->
+    <!-- Items table -->
     <div>
         <table class="table table-bordered table-hover" id="itemTable">
 
@@ -298,7 +298,7 @@ function updateItemAjax(item, callback) {
         dataType: "JSON",
         contentType: "application/json; charset=utf-8",
         success: function(updatedItem) {
-            callback(updatedItem); // ✅ this is critical
+            callback(updatedItem); //
         },
         error: function(xhr, status, error) {
             console.error("Error updating item:", xhr.status, error);
